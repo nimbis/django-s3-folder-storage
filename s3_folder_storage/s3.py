@@ -26,6 +26,16 @@ class StaticStorage(FixedS3BotoStorage):
         kwargs['location'] = settings.STATIC_S3_PATH
         super(StaticStorage, self).__init__(*args, **kwargs)
 
+    def url(self, name):
+        """
+        Override static storage to disable credentials that break cache.
+        See: http://stackoverflow.com/questions/15668443/
+             django-storage-with-s3-boto-break-browser-cache
+        """
+
+        name = self._clean_name(name)
+        return '{0}{1}'.format(settings.STATIC_URL, name)
+
 class DefaultStorage(FixedS3BotoStorage):
     """
     Storage for uploaded media files.
